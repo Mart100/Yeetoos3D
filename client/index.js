@@ -1,7 +1,7 @@
 let ctx, canvas
 let input = {
     keys: {}, 
-    mouse: {movement: {x: 0, y: 0, latest: 0}, locked: false},
+    mouse: {movement: {x: 0, y: 0, latest: 0}, locked: false, isDown: false},
     movement: {w: false, a: false, s: false, d: false, shift: false}
 }
 let debugPanel
@@ -79,6 +79,10 @@ function inputHandler() {
     } else if ("onmozpointerlockchange" in document) {
         document.addEventListener('mozpointerlockchange', lockChange, false)
     }
+
+    // on mouse down and up 
+    $('#canvas').on('mousedown', () => { input.mouse.isDown = true})
+    $('#canvas').on('mouseup', () => { input.mouse.isDown = false})
 
     function lockChange() {
         if(document.pointerLockElement === canvas || document.mozPointerLockElement === canvas) input.mouse.locked = true
