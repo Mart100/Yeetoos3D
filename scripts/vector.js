@@ -76,9 +76,9 @@ class Vector {
 
       // if all
       if(axis == 'all') {
-        this.rotate('x', angle.x)
         this.rotate('y', angle.y)
         this.rotate('z', angle.z)
+        this.rotate('x', angle.x)
         return this
       }
 
