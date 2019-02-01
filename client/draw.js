@@ -65,21 +65,6 @@ function frame() {
 		}
 	}
 
-
-	/*// put every face in order
-	drawList.sort((a, b) => {
-		let A = 0
-		for(i of a.corners) A += i.z
-		A = A/a.corners.length
-
-		let B = 0
-		for(i of b.corners) B += i.z
-		B = B/b.corners.length
-
-		debugPanel.add('k', A+'[]'+B)
-		return B-A
-	})*/
-
 	// draw everything from drawList (all Faces)
 	for(objectNum in drawList) {
 
@@ -110,6 +95,9 @@ function frame() {
 		ctx.strokeStyle = '#000000'
 		if(settings.strokeBlack) ctx.stroke()
 	}
+
+	drawCrosshair()
+	drawPlayerStuff()
 }
 
 function DegToRad(degree) {
@@ -146,4 +134,33 @@ function p3D_to_p2D(corner) {
 	final2D = new Vector(r * VTTC.x, r * VTTC.z, VTTC.z)
 
 	return final2D
+}
+
+function drawCrosshair() {
+	resetCtx()
+	ctx.fillStyle = 'white'
+
+
+	ctx.fillRect(-20,     -1.5,    10,   3) // left
+	ctx.fillRect(-1,      -20.5,   3,    10) // top
+	ctx.fillRect(20,      -1.5,   -10,   3) // right
+	ctx.fillRect(-1,       20.5,   3,   -10) // bottom
+	ctx.fillRect(-1, -1.5, 3, 3) // middle
+}
+
+function drawPlayerStuff() {
+	
+	// Draw health Text
+	resetCtx()
+	ctx.fillStyle = 'rgb(200, 200, 200)'
+
+	// loop trough players
+	for(let id in players) {
+		let player = players[id]
+		if(id == socket.id) continue
+		let player2D = p3D_to_p2D(player.pos)
+		let magnitude = player.pos.clone().minus(World.player.pos).getMagnitude()
+		ctx.font = `${100 - magnitude/20}px Arial`
+		ctx.fillText(Math.round(player.health), player2D.x, player2D.y);
+	}
 }
