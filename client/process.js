@@ -11,7 +11,13 @@ function tick() {
   // send player data
   socket.emit('playerMovement', input.movement)
   socket.emit('playerRotation', World.player.rot)
+  socket.emit('playerMouse', input.mouse)
 
+  // if mouse down. play sound
+  if(input.mouse.isDown && players[socket.id].shooting.cooldown < 1) {
+    console.log('pew')
+    sounds.pew.play()
+  }
 }
 
 
