@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/client/index.html')
 })
 
-http.listen(port, () => console.log(`Yeetoos3D listening on port ${port}!`))
+http.listen(process.env.PORT || port, () => console.log(`Yeetoos3D listening on port ${port}!`))
 
 // when client connects to socket.io
 io.on('connection', (socket) => {
