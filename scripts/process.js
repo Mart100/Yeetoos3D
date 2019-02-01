@@ -19,39 +19,9 @@ function tickPlayer(player, objects, players, io) {
   // apply gravity
   if(player.pos.y > 0) player.pos.y -= 5
   
-  // moving
-  if(player.movement.w) { // W
-    let rot = player.rot.y + Math.PI/2
-    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
-    if(player.movement.shift) vec.multiply(2)
-    vec.multiply(2)
-    player.pos.plus(vec)
-    player.movement.walking = true
-  }
-
-  if(player.movement.s) { // S
-    let rot = player.rot.y - Math.PI/2
-    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
-    vec.multiply(2)
-    player.pos.plus(vec)
-    player.movement.walking = true
-  }
-
-  if(player.movement.a) { // A
-    let rot = player.rot.y
-    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
-    vec.multiply(2)
-    player.pos.plus(vec)
-    player.movement.walking = true
-  }
-  
-  if(player.movement.d) { // D
-    let rot = player.rot.y - Math.PI
-    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
-    vec.multiply(2)
-    player.pos.plus(vec)
-    player.movement.walking = true
-  }
+  playerMovement(player)
+  playerShooting(player, players)
+  playerRegeneration(player)
 
 }
 
@@ -59,6 +29,103 @@ function tickPlayer(player, objects, players, io) {
 function tickObject(object, objects, players, io) {
   let objectS = object.settings
 
+  objectFollow(object, objects, players, io)
+
+}
+
+function playerRegeneration(player) {
+  if(player.health < 100) player.health += 0.1
+}
+
+function playerShooting(player, players) {
+  // countdown countdown
+  player.shooting.cooldown--
+
+  // if player countdown < 0. And mouseDown SHOOOOT
+  if(player.shooting.cooldown < 0 && player.mouse.isDown) {
+    // check if "bullet" hit player
+
+    // loop trough players
+    for(let id in players) {
+      let opp = players[id]
+
+      if(id == player.id) continue
+
+      let oppPos = opp.pos.clone()
+
+      oppPos.rotate('all', player.rot)
+      oppPos.minus(player.pos)
+      
+      // perspective
+      let r = 400 / oppPos.y
+      if(r < 0) r *= -1
+      oppPos = new Vector(r * oppPos.x, r * oppPos.z, oppPos.z)
+
+      // if hit
+      if(Math.abs(oppPos.x) < 200 && Math.abs(oppPos.y) < 200) {
+        opp.health -= 10
+        console.log('HIT')
+      }
+    }
+    // reset cooldown
+    player.shooting.cooldown = 25
+
+  }
+
+}
+
+function playerMovement(player) {
+  let rot = 0
+  // moving
+  if(player.movement.w) { // W
+    rot = player.rot.y + Math.PI/2
+    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
+    if(player.movement.shift) vec.multiply(2)
+    vec.multiply(3)
+    vec = checkPlayerCollision(player, objects, vec)
+    player.pos.plus(vec)
+  }
+
+  if(player.movement.s) { // S
+    rot = player.rot.y - Math.PI/2
+    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
+    vec.multiply(3)
+    vec = checkPlayerCollision(player, objects, vec)
+    player.pos.plus(vec)
+  }
+
+  if(player.movement.a) { // A
+    rot = player.rot.y
+    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
+    vec.multiply(3)
+    vec = checkPlayerCollision(player, objects, vec)
+    player.pos.plus(vec)
+  }
+  
+  if(player.movement.d) { // D
+    rot = player.rot.y - Math.PI
+    let vec = new Vector(Math.cos(rot), 0, Math.sin(rot))
+    vec.multiply(3)
+    vec = checkPlayerCollision(player, objects, vec)
+    player.pos.plus(vec)
+  }
+
+  // any movement
+  if(player.movement.w || player.movement.a || player.movement.s || player.movement.d) {
+    player.movement.walking = true
+  }
+
+}
+
+function checkPlayerCollision(player, objects, move) {
+  // sort objects closest to player
+  objects.sort(() => {
+    
+  })
+}
+
+function objectFollow(object, objects, players, io) {
+  let objectS = object.settings
   // if object has follow property. Follow
   if(objectS.follow != undefined) {
     let follow = objectS.follow
@@ -70,7 +137,7 @@ function tickObject(object, objects, players, io) {
     if(follow.id.split(':')[0] == 'player') {
       otf = players[follow.id.split(':')[1]]
     }
-    if(otf == undefined) return console.log('otf Undefined; process.js/73; :: '+follow.id)
+    if(otf == undefined) return
 
     object.setPos(otf.pos) // set position to target
 
@@ -88,7 +155,5 @@ function tickObject(object, objects, players, io) {
     // send updated position of object to client
     io.emit('updateObject', object)
   }
-
 }
-
 module.exports = tick
