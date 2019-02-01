@@ -16,7 +16,14 @@ function handleSocket(socket, objects, players, io) {
       s: false,
       d: false,
       shift: false,
-    }
+    },
+    mouse: {
+      isDown: false
+    },
+    shooting: {
+      cooldown: 0
+    },
+    health: 100
   }
 
   // send all objects to client
@@ -48,6 +55,11 @@ function handleSocket(socket, objects, players, io) {
   // when client sends rotation
   socket.on('playerRotation', rot => { 
     players[socket.id].rot = rot
+  })
+
+  // when client sends mouse info
+  socket.on('playerMouse', mouse => { 
+    players[socket.id].mouse = mouse
   })
 }
 
