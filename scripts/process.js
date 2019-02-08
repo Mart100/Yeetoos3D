@@ -1,4 +1,5 @@
 let Vector = require('./vector.js')
+let mathUtils = require('./mathUtils.js')
 
 function tick(objects, players, io) {
 
@@ -19,7 +20,7 @@ function tickPlayer(player, objects, players, io) {
   // apply gravity
   if(player.pos.y > 0) player.pos.y -= 5
   
-  playerMovement(player)
+  playerMovement(player, objects)
   playerShooting(player, players)
   playerRegeneration(player)
 
@@ -74,7 +75,7 @@ function playerShooting(player, players) {
 
 }
 
-function playerMovement(player) {
+function playerMovement(player, objects) {
   let rot = 0
   // moving
   if(player.movement.w) { // W
@@ -118,10 +119,21 @@ function playerMovement(player) {
 }
 
 function checkPlayerCollision(player, objects, move) {
+
   // sort objects closest to player
-  objects.sort(() => {
-    
+  objects.sort((a, b) => {
+    let A = mathUtils.getPointClosestToLine(player.pos.clone().to2D(), a.corners[0].clone().to2D(), a.corners[2].clone().to2D())
+    let B = mathUtils.getPointClosestToLine(player.pos.clone().to2D(), b.corners[0].clone().to2D(), b.corners[2].clone().to2D())
+
+    let magA = A.clone().minus(player.pos).getMagnitude()
+    let magB = B.clone().minus(player.pos).getMagnitude()
+    a.mag = magA
+    b.mag = magB
+    return magA-magB
   })
+  console.log(objects)
+  console.log(objects[0].settings.id, objects[0].mag)
+  return move
 }
 
 function objectFollow(object, objects, players, io) {
@@ -156,4 +168,6 @@ function objectFollow(object, objects, players, io) {
     io.emit('updateObject', object)
   }
 }
+
+
 module.exports = tick

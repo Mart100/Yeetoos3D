@@ -9,6 +9,7 @@ let handleSocket = require('./scripts/socketHandler.js')
 let createWorld = require('./scripts/createWorld.js')
 let Vector = require('./scripts/vector.js')
 let tick = require('./scripts/process.js')
+let mathUtils = require('./scripts/mathUtils.js')
 
 // create objects
 let objects = []
@@ -34,3 +35,7 @@ io.on('connection', (socket) => {
 
 // run process
 setInterval(() => { tick(objects, players, io)}, 10)
+
+
+// testing
+console.log(mathUtils.getPointClosestToLine(new Vector(0, 0), new Vector(0, 1), new Vector(1, 0)))

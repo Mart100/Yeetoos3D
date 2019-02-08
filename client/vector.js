@@ -21,7 +21,10 @@ class Vector {
     multiply(With) {
       // if its another vector
       if(With.x != undefined) {
-        return new Vector(this.x*With.x, this.y*With.y, this.z*With.z)
+        this.x *= With.x
+        this.y *= With.y
+        this.z *= With.z
+        return this
       }
       // if its a number
       else if(!isNaN(With)) {
@@ -66,11 +69,17 @@ class Vector {
     divide(With) {
       // if its another vector
       if(With.x != undefined) {
-        return new Vector(this.x/With.x, this.y/With.y, this.z/With.z)
+        this.x /= With.x
+        this.y /= With.y
+        this.z /= With.z
+        return this
       }
       // if its a number
       else if(!isNaN(With)) {
-        return new Vector(this.x/With, this.y/With, this.z/With)
+        this.x /= With
+        this.y /= With
+        this.z /= With
+        return this
       }
     }
     edit(What, To) {
